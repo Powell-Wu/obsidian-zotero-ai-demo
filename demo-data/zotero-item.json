@@ -1,0 +1,39 @@
+[
+  {
+    "id": "tunnermann2026DataModel",
+    "type": "article-journal",
+    "title": "Data-model-guided framework for systemic emittance minimization in high-brightness photoinjectors",
+    "author": [
+      { "family": "Tünnermann", "given": "H." },
+      { "family": "Chen", "given": "Y." },
+      { "family": "Klemps", "given": "A." },
+      { "family": "Ilia", "given": "D." },
+      { "family": "Cai", "given": "M." },
+      { "family": "Ay", "given": "N." },
+      { "family": "Beutner", "given": "B." },
+      { "family": "Brinker", "given": "F." },
+      { "family": "Decking", "given": "W." },
+      { "family": "Good", "given": "J." },
+      { "family": "Hartl", "given": "I." },
+      { "family": "Hillert", "given": "W." },
+      { "family": "Jiang", "given": "Y." },
+      { "family": "Li", "given": "C." },
+      { "family": "Long", "given": "T." },
+      { "family": "Mahnke", "given": "C." },
+      { "family": "Panuganti", "given": "H." },
+      { "family": "Pressacco", "given": "F." },
+      { "family": "Scholz", "given": "M." }
+    ],
+    "container-title": "Physical Review Accelerators and Beams",
+    "volume": "29",
+    "issue": "5",
+    "page": "050701",
+    "DOI": "10.1103/kk2s-s43l",
+    "URL": "https://doi.org/10.1103/kk2s-s43l",
+    "issued": { "date-parts": [[2026, 5, 8]] },
+    "language": "en",
+    "rights": "Creative Commons Attribution 4.0 International",
+    "abstract": "Bunch shaping in electron linear accelerators is of critical importance, as it enables the realization of prescribed projection profiles along specific coordinates of the bunch distribution for linac-based x-ray free-electron laser (XFEL) applications. It is evident that temporally flattop electron bunches yield more uniform slice properties, reduced emittance growth, and enhanced FEL gain compared to conventional Gaussian profiles. In this work, we present a data- and model-guided framework that consists of a physics-informed model and an inverse emittance model for minimizing the bunch emittance through laser pulse shaping and the control of laser and accelerator parameters in high-brightness photoinjectors. With a temporal flattop laser shape selected, a flat slice emittance distribution along the bunch has been experimentally obtained at the European XFEL. A measured central slice emittance of about 0.4 μm at 250 pC is achieved using a 20 ps flattop laser pulse at the photocathode. Here we present the results of a commissioning experiment, marking a practical application of temporally flattop-shaped electron bunches for stable photon delivery in a user experiment week at the facility. Within limited tuning time, a pulse energy of 1.7 mJ has been achieved at photon energies of 7.1 and 7.6 keV for the two hard x-ray undulator beamlines, surpassing the user requirements. Such a data- and model-driven framework opens up new opportunities for end-to-end optimization of machine parameters, thereby enhancing the capabilities of large-scale FEL facilities.",
+    "note": "Demo item DEMO001 newly created from public metadata on 2026-11-12. Not exported from any personal Zotero library. Publisher PDF: https://journals.aps.org/prab/pdf/10.1103/kk2s-s43l"
+  }
+]

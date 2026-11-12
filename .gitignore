@@ -1,0 +1,6 @@
+# Local PDF extraction and headless-browser dependencies/profiles; not demo content.
+.tools/
+
+# OS-generated files.
+.DS_Store
+Thumbs.db

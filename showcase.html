@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="公开论文经 Zotero 批注、Obsidian 文献笔记与 AI 两遍整理，形成带出处组会大纲的脱敏演示。">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>证据链，而非黑箱｜Obsidian + Zotero + AI 演示</title>
+  <style>
+    :root {
+      --paper: #f6f7f3;
+      --surface: #ffffff;
+      --surface-soft: #f0f4f1;
+      --ink: #17324a;
+      --muted: #5d6c75;
+      --line: #dce4df;
+      --green: #147a64;
+      --green-soft: #e6f3ed;
+      --blue: #2b62a8;
+      --blue-soft: #eaf1fb;
+      --amber: #9b6414;
+      --amber-soft: #fff4dc;
+      --red: #a03e3e;
+      --shadow: 0 16px 45px rgba(23, 50, 74, .07);
+      --radius: 20px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(20, 122, 100, .07), transparent 27rem),
+        var(--paper);
+      color: var(--ink);
+      font-family: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.72;
+    }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { color: inherit; }
+    a { color: var(--blue); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    a:hover { color: var(--green); }
+    a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+      outline: 3px solid rgba(43, 98, 168, .35);
+      outline-offset: 3px;
+    }
+    .skip-link { position: absolute; left: 1rem; top: -5rem; background: var(--surface); padding: .6rem 1rem; z-index: 20; }
+    .skip-link:focus { top: 1rem; }
+    .shell { width: min(1460px, calc(100% - 48px)); margin: 0 auto; }
+    .topbar {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: .75rem; font-weight: 760; letter-spacing: -.02em; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--ink);
+      color: #fff;
+      font-family: ui-monospace, monospace;
+      font-size: 13px;
+    }
+    .brand small { display: block; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+    .top-actions { display: flex; align-items: center; gap: .65rem; }
+    .privacy-chip { color: var(--green); background: var(--green-soft); border-radius: 99px; padding: .3rem .75rem; font-size: 12px; font-weight: 700; }
+    .text-button {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.65);
+      padding: .5rem .8rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .text-button:hover { border-color: var(--green); background: var(--surface); }
+    .hero { padding: 48px 0 34px; display: grid; grid-template-columns: 1.45fr .85fr; gap: 42px; align-items: end; }
+    .eyebrow { margin: 0 0 .8rem; color: var(--green); font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(34px, 4.2vw, 60px); line-height: 1.12; letter-spacing: -.045em; max-width: 850px; }
+    h1 span { color: var(--green); }
+    .hero-copy { margin: 1.3rem 0 0; max-width: 760px; color: var(--muted); font-size: 17px; }
+    .hero-flow { margin-top: 1.35rem; display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; font-size: 13px; font-weight: 700; }
+    .hero-flow span { background: var(--surface); border: 1px solid var(--line); padding: .32rem .62rem; border-radius: 8px; }
+    .hero-flow b { color: #9aaaa2; font-weight: 500; }
+    .source-card { background: var(--ink); color: #fff; padding: 25px; border-radius: var(--radius); box-shadow: var(--shadow); }
+    .source-card .eyebrow { color: #8cdbbf; }
+    .source-card h2 { font-size: 18px; line-height: 1.45; margin: 0 0 1rem; letter-spacing: -.015em; }
+    .source-card p { margin: .4rem 0; color: #d6e1e8; font-size: 13px; }
+    .source-card a { color: #a9dfea; }
+    .source-meta { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0; }
+    .source-meta span { border: 1px solid rgba(255,255,255,.2); border-radius: 6px; padding: .2rem .45rem; font: 11px ui-monospace, monospace; }
+    .doi-row { display: flex; gap: .5rem; align-items: center; margin-top: 1rem; }
+    .doi-row code { font-size: 12px; overflow-wrap: anywhere; }
+    .doi-row button { margin-left: auto; background: transparent; color: #fff; border-color: rgba(255,255,255,.3); white-space: nowrap; }
+    .workspace { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 30px; padding-bottom: 58px; }
+    .step-sidebar { position: sticky; top: 20px; align-self: start; }
+    .step-sidebar h2 { margin: 0 0 .75rem; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+    .step-nav { display: grid; gap: .35rem; }
+    .step-button {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 31px 1fr;
+      gap: .65rem;
+      align-items: center;
+      text-align: left;
+      padding: .72rem .75rem;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .step-button .number { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 50%; font: 11px ui-monospace, monospace; background: rgba(255,255,255,.6); }
+    .step-button:hover { background: rgba(255,255,255,.7); color: var(--ink); }
+    .step-button[aria-current="step"] { background: var(--surface); border-color: var(--line); color: var(--ink); box-shadow: 0 5px 20px rgba(23,50,74,.05); font-weight: 750; }
+    .step-button[aria-current="step"] .number { background: var(--green); border-color: var(--green); color: #fff; }
+    .sidebar-note { margin-top: 1.2rem; padding: 1rem; border-left: 2px solid var(--green); color: var(--muted); font-size: 12px; }
+    .sidebar-note strong { display: block; color: var(--ink); margin-bottom: .3rem; }
+    .main { min-width: 0; }
+    .progress-wrap { display: flex; align-items: center; gap: .8rem; margin-bottom: 14px; color: var(--muted); font: 11px ui-monospace, monospace; }
+    .progress-track { height: 4px; background: var(--line); flex: 1; border-radius: 4px; overflow: hidden; }
+    .progress-bar { height: 100%; width: 16.667%; background: var(--green); transition: width .25s ease; }
+    .step-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(24px, 4vw, 48px); min-height: 620px; }
+    .step-panel[hidden] { display: none; }
+    .panel-head { display: flex; align-items: start; justify-content: space-between; gap: 1rem; margin-bottom: 28px; }
+    .panel-kicker { margin: 0 0 .35rem; color: var(--green); font: 700 11px ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase; }
+    .panel-head h2 { margin: 0; font-size: clamp(25px, 3vw, 36px); line-height: 1.25; letter-spacing: -.035em; }
+    .panel-head p { margin: .75rem 0 0; color: var(--muted); max-width: 750px; }
+    .source-link { white-space: nowrap; font-size: 12px; border: 1px solid var(--line); border-radius: 8px; padding: .35rem .55rem; text-decoration: none; }
+    .source-link:hover { border-color: var(--green); }
+    .panel-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .nav-button { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: .55rem .85rem; cursor: pointer; font-size: 13px; }
+    .nav-button.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .nav-button:hover:not(:disabled) { border-color: var(--green); }
+    .nav-button:disabled { opacity: .35; cursor: default; }
+    .key-hint { color: var(--muted); font-size: 11px; }
+    kbd { border: 1px solid var(--line); background: var(--surface-soft); border-radius: 4px; padding: .05rem .3rem; font-family: ui-monospace, monospace; }
+    .notice { padding: 15px 18px; border-radius: 12px; margin: 18px 0; font-size: 14px; }
+    .notice.green { background: var(--green-soft); border-left: 3px solid var(--green); }
+    .notice.amber { background: var(--amber-soft); border-left: 3px solid var(--amber); }
+    .notice strong { color: var(--ink); }
+    .metadata-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin: 20px 0; }
+    .metadata-item { background: var(--surface); padding: 16px 18px; }
+    .metadata-item small { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .25rem; }
+    .metadata-item strong { font-size: 14px; font-weight: 650; overflow-wrap: anywhere; }
+    .button-row { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1rem; }
+    .button-row a { display: inline-block; background: var(--surface-soft); border: 1px solid var(--line); padding: .5rem .75rem; border-radius: 9px; text-decoration: none; font-size: 13px; }
+    .button-row a:hover { border-color: var(--green); }
+    .annotation-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .annotation-card { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    .annotation-top { display: flex; align-items: center; justify-content: space-between; padding: .55rem .85rem; background: var(--surface-soft); font: 11px ui-monospace, monospace; color: var(--muted); }
+    .annotation-body { padding: 16px 18px; }
+    blockquote { margin: 0; color: #344c5d; font-family: Georgia, "Times New Roman", serif; font-size: 14px; line-height: 1.65; }
+    .reader-comment { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--muted); }
+    .reader-comment b { color: var(--amber); }
+    .er-tag { display: inline-block; border-radius: 5px; background: var(--blue-soft); color: var(--blue); padding: .05rem .35rem; font: 10px ui-monospace, monospace; }
+    .stage-rail { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-bottom: 22px; }
+    .stage-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: var(--surface); text-align: left; cursor: pointer; }
+    .stage-card:hover, .stage-card[aria-selected="true"] { border-color: var(--green); box-shadow: 0 0 0 2px rgba(20,122,100,.09); }
+    .stage-card small { display: block; font: 10px ui-monospace, monospace; color: var(--muted); }
+    .stage-card strong { display: block; margin-top: .25rem; font-size: 14px; }
+    .stage-card span { display: block; color: var(--muted); font-size: 12px; margin-top: .35rem; }
+    .stage-detail { border-radius: 15px; background: var(--surface-soft); padding: 24px; }
+    .stage-detail[hidden] { display: none; }
+    .stage-detail h3 { margin: 0 0 .8rem; font-size: 21px; }
+    .stage-detail h4 { margin: 1.3rem 0 .4rem; font-size: 14px; }
+    .stage-detail ul { margin: .5rem 0; padding-left: 1.25rem; }
+    .stage-detail li { margin: .35rem 0; font-size: 14px; }
+    .diff-line { display: grid; grid-template-columns: 110px 1fr; gap: 12px; padding: .65rem 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .diff-line:last-child { border-bottom: 0; }
+    .diff-line b { color: var(--green); }
+    .concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .concept-card { border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+    .concept-card .concept-no { font: 11px ui-monospace, monospace; color: var(--green); }
+    .concept-card h3 { margin: .35rem 0 .8rem; font-size: 20px; line-height: 1.4; }
+    .concept-card p, .concept-card li { font-size: 13px; color: var(--muted); }
+    .concept-card ul { padding-left: 1.1rem; }
+    .wording { margin-top: 1rem; border-radius: 10px; overflow: hidden; font-size: 12px; }
+    .wording div { padding: .65rem .8rem; }
+    .wording .allowed { background: var(--green-soft); }
+    .wording .forbidden { background: #faeceb; color: var(--red); }
+    .filter-input { width: min(340px, 100%); padding: .55rem .75rem; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--ink); }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 13px; margin-top: 15px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 12px 13px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { background: var(--surface-soft); color: var(--muted); font-size: 11px; letter-spacing: .04em; }
+    tr:last-child td { border-bottom: 0; }
+    td:first-child { font: 700 11px ui-monospace, monospace; color: var(--blue); white-space: nowrap; }
+    .evidence-row[hidden] { display: none; }
+    .boundary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+    .boundary-card { padding: 16px; border-radius: 12px; background: var(--amber-soft); }
+    .boundary-card strong { display: block; font-size: 13px; margin-bottom: .3rem; }
+    .boundary-card span { font-size: 12px; color: #72572e; }
+    .outline-tools { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 16px; }
+    .outline-list { display: grid; gap: 10px; }
+    .outline-slide { border: 1px solid var(--line); border-radius: 13px; background: var(--surface); overflow: hidden; }
+    .outline-slide summary { list-style: none; cursor: pointer; padding: 16px 18px; display: grid; grid-template-columns: 34px 1fr auto; gap: .75rem; align-items: center; }
+    .outline-slide summary::-webkit-details-marker { display: none; }
+    .outline-slide summary:hover { background: var(--surface-soft); }
+    .slide-number { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: var(--ink); color: #fff; font: 12px ui-monospace, monospace; }
+    .slide-title { font-size: 14px; font-weight: 750; }
+    .slide-time { color: var(--muted); font: 11px ui-monospace, monospace; }
+    .slide-content { padding: 0 22px 18px 62px; }
+    .slide-content ul { margin: 0; padding-left: 1.2rem; }
+    .slide-content li { margin: .45rem 0; font-size: 13px; }
+    .citation { margin-top: 12px; padding: 9px 11px; border-radius: 8px; background: var(--blue-soft); color: #345778; font: 11px ui-monospace, monospace; overflow-wrap: anywhere; }
+    .visual-note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+    .reference-box { margin-top: 20px; padding: 18px; border: 1px solid var(--line); border-radius: 12px; font-size: 12px; color: var(--muted); }
+    .reference-box strong { color: var(--ink); }
+    .page-footer { border-top: 1px solid var(--line); padding: 24px 0 35px; display: flex; justify-content: space-between; gap: 1rem; color: var(--muted); font-size: 11px; }
+    .status { min-height: 1.5em; color: var(--green); font-size: 12px; }
+    .no-js { padding: 1rem; background: var(--amber-soft); }
+    @media (max-width: 1050px) {
+      .hero { grid-template-columns: 1fr; gap: 24px; }
+      .source-card { max-width: 720px; }
+      .workspace { grid-template-columns: 205px minmax(0,1fr); gap: 18px; }
+      .annotation-layout, .concept-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 24px, 680px); }
+      .topbar { min-height: 64px; }
+      .brand small, .privacy-chip, .key-hint { display: none; }
+      .hero { padding: 32px 0 25px; }
+      h1 { font-size: 37px; }
+      .workspace { display: block; }
+      .step-sidebar { position: static; margin-bottom: 14px; }
+      .step-sidebar h2, .sidebar-note { display: none; }
+      .step-nav { display: flex; overflow-x: auto; padding-bottom: 5px; }
+      .step-button { min-width: 145px; grid-template-columns: 25px 1fr; padding: .55rem; background: rgba(255,255,255,.6); }
+      .step-button .number { width: 24px; height: 24px; }
+      .step-panel { padding: 22px 18px; min-height: 0; }
+      .panel-head { display: block; }
+      .source-link { display: inline-block; margin-top: 12px; }
+      .metadata-grid, .stage-rail, .boundary-grid { grid-template-columns: 1fr; }
+      .stage-card span { display: none; }
+      .diff-line { grid-template-columns: 1fr; gap: 2px; }
+      .slide-content { padding-left: 22px; }
+      .outline-slide summary { grid-template-columns: 32px 1fr; }
+      .slide-time { display: none; }
+      .page-footer { display: block; }
+    }
+    @media print {
+      body { background: #fff; font-size: 11pt; }
+      .topbar, .hero, .step-sidebar, .progress-wrap, .panel-footer, .page-footer, .outline-tools, .skip-link { display: none !important; }
+      .shell, .workspace { display: block; width: 100%; margin: 0; }
+      .step-panel { display: none !important; box-shadow: none; border: 0; padding: 0; }
+      body.print-outline #step-6 { display: block !important; }
+      .outline-slide { break-inside: avoid; margin-bottom: 10px; }
+      .outline-slide > * { display: block; }
+      .outline-slide summary { cursor: default; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#demo-main">跳到演示内容</a>
+  <header class="topbar shell">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">ER</span>
+      <div>证据链，而非黑箱<small>Obsidian × Zotero × AI</small></div>
+    </div>
+    <div class="top-actions">
+      <span class="privacy-chip">公开论文 · 新建批注 · 无私人库</span>
+      <a class="text-button" href="README.md">打开 README</a>
+    </div>
+  </header>
+
+  <section class="hero shell" aria-labelledby="page-title">
+    <div>
+      <p class="eyebrow">A traceable literature workflow</p>
+      <h1 id="page-title">从一篇公开论文，<br>到一场<span>句句有出处</span>的组会。</h1>
+      <p class="hero-copy">真实全文、真实页码、真实整理结果。演示 Zotero 如何保存阅读痕迹，Obsidian 如何连接知识，以及 AI 如何在两遍整理中增加结构，而不是增加论文没有说过的结论。</p>
+      <div class="hero-flow" aria-label="工作流概览">
+        <span>公开论文</span><b>→</b><span>Zotero 批注</span><b>→</b><span>AI 两遍整理</span><b>→</b><span>概念笔记</span><b>→</b><span>组会大纲</span>
+      </div>
+    </div>
+    <article class="source-card" aria-label="演示论文来源">
+      <p class="eyebrow">Open-access source / 2026</p>
+      <h2>Data-model-guided framework for systemic emittance minimization in high-brightness photoinjectors</h2>
+      <p>H. Tünnermann et al. · Physical Review Accelerators and Beams</p>
+      <p>29(5), 050701 · Published 8 May 2026</p>
+      <div class="source-meta"><span>FULL TEXT · 9 PAGES</span><span>CC BY 4.0</span><span>DOI VERIFIED</span></div>
+      <div class="doi-row">
+        <code>10.1103/kk2s-s43l</code>
+        <button class="text-button" id="copy-doi" type="button">复制 DOI</button>
+      </div>
+      <div class="status" id="copy-status" role="status" aria-live="polite"></div>
+    </article>
+  </section>
+
+  <div class="workspace shell">
+    <aside class="step-sidebar" aria-label="演示步骤">
+      <h2>Workflow / 六步</h2>
+      <nav class="step-nav">
+        <button class="step-button" type="button" data-step="0" aria-current="step"><span class="number">01</span><span>公开论文与许可</span></button>
+        <button class="step-button" type="button" data-step="1"><span class="number">02</span><span>Zotero 批注导入</span></button>
+        <button class="step-button" type="button" data-step="2"><span class="number">03</span><span>AI 两遍整理</span></button>
+        <button class="step-button" type="button" data-step="3"><span class="number">04</span><span>概念笔记提升</span></button>
+        <button class="step-button" type="button" data-step="4"><span class="number">05</span><span>证据边界复核</span></button>
+        <button class="step-button" type="button" data-step="5"><span class="number">06</span><span>最终组会大纲</span></button>
+      </nav>
+      <div class="sidebar-note"><strong>本地资料 ≠ 本地模型</strong>本网页不联网，但实际 AI 工具是否发送数据，取决于客户端、插件和模型提供方配置。</div>
+    </aside>
+
+    <main class="main" id="demo-main">
+      <div class="progress-wrap" aria-hidden="true"><span id="step-count">STEP 01 / 06</span><div class="progress-track"><div class="progress-bar" id="progress-bar"></div></div></div>
+      <noscript><p class="no-js">JavaScript 已关闭：请展开下方各步骤的源 Markdown 文件阅读；启用 JavaScript 后可使用步骤切换与对照功能。</p></noscript>
+
+      <section class="step-panel" id="step-1" data-title="公开论文与许可" aria-labelledby="step-1-title">
+        <div class="panel-head">
+          <div><p class="panel-kicker">Step 01 / Source</p><h2 id="step-1-title">先证明来源，再开始摘要。</h2><p>出版方 PDF、Crossref 与 FELTrace 公开条目交叉核验。科学内容以 9 页出版社 PDF 为准，不使用未核实的 arXiv 版本。</p></div>
+          <a class="source-link" href="99附件/来源与许可.md">源文件：来源与许可.md</a>
+        </div>
+        <div class="metadata-grid">
+          <div class="metadata-item"><small>Citekey</small><strong>tunnermann2026DataModel</strong></div>
+          <div class="metadata-item"><small>DOI</small><strong>10.1103/kk2s-s43l</strong></div>
+          <div class="metadata-item"><small>发表</small><strong>2026-05-08 · 29(5), 050701</strong></div>
+          <div class="metadata-item"><small>许可</small><strong>Creative Commons Attribution 4.0</strong></div>
+        </div>
+        <div class="notice green"><strong>全文级演示。</strong>方法、实验、结论和 Data Availability 均已回查。PDF 第 1 页明确要求再分发时保留作者、文章题名、期刊引用与 DOI。</div>
+        <div class="notice amber"><strong>开放全文不等于开放数据。</strong>PDF 第 8 页写明支撑数据不公开、可向作者合理申请。本案例没有原始实验数据，也不声称做了数据再分析。</div>
+        <h3>作者（完整 19 位）</h3>
+        <p>H. Tünnermann; Y. Chen; A. Klemps; D. Ilia; M. Cai; N. Ay; B. Beutner; F. Brinker; W. Decking; J. Good; I. Hartl; W. Hillert; Y. Jiang; C. Li; T. Long; C. Mahnke; H. Panuganti; F. Pressacco; M. Scholz</p>
+        <div class="button-row">
+          <a href="99附件/tunnermann2026-data-model-guided-emittance.pdf">打开本地公开 PDF</a>
+          <a href="99附件/tunnermann2026-data-model-guided-emittance.txt">打开带页码全文文本</a>
+          <a href="https://doi.org/10.1103/kk2s-s43l" rel="noreferrer">访问 DOI 原文</a>
+          <a href="https://powell-wu.github.io/feltrace/items/j3c855bojfvzoprvpz0dey881/" rel="noreferrer">访问 FELTrace 条目</a>
+          <a href="https://creativecommons.org/licenses/by/4.0/" rel="noreferrer">查看 CC BY 4.0</a>
+        </div>
+        <div class="panel-footer"><button class="nav-button prev" type="button" disabled>上一步</button><span class="key-hint"><kbd>←</kbd> <kbd>→</kbd> 切换步骤</span><button class="nav-button primary next" type="button">下一步：查看批注</button></div>
+      </section>
+
+      <section class="step-panel" id="step-2" data-title="Zotero 批注导入" aria-labelledby="step-2-title" hidden>
+        <div class="panel-head">
+          <div><p class="panel-kicker">Step 02 / Annotations</p><h2 id="step-2-title">保留阅读痕迹，也保留它的混乱。</h2><p>六条批注从公开 PDF 新建。条目键、批注 ID、时间、颜色和 Demo Reader 评论是演示数据；引句和页码来自论文原文。</p></div>
+          <a class="source-link" href="demo-data/zotero-annotations-import.md">源文件：批注导入.md</a>
+        </div>
+        <div class="notice amber"><strong>不是个人 Zotero 库导出。</strong>简化 JSON 不伪造 PDF 矩形坐标，也不声称是 Zotero 官方直接导入备份。读者评论只帮助定位，不能成为论文证据。</div>
+        <div class="annotation-layout">
+          <article class="annotation-card"><div class="annotation-top"><span>DEMO-A01 · PDF p. 1</span><span class="er-tag">ER-03</span></div><div class="annotation-body"><blockquote>A measured central slice emittance of about 0.4 μm at 250 pC is achieved using a 20 ps flattop laser pulse at the photocathode.</blockquote><div class="reader-comment"><b>Demo Reader：</b>250 pC、中央切片发射度、20 ps。不要和 200 pC 的投影发射度比较混在一起。</div></div></article>
+          <article class="annotation-card"><div class="annotation-top"><span>DEMO-A02 · PDF p. 5</span><span class="er-tag">ER-02</span></div><div class="annotation-body"><blockquote>To be precise, the modeling with extended measurements yielded (i) a faster training convergence, (ii) a decreased test prediction error by around one order of magnitude, (iii) a reduction of model complexity by approximately 50% (measured by the number of parameters) while maintaining the same prediction accuracy compared to the model with measurements y as defined in (1).</blockquote><div class="reader-comment"><b>Demo Reader：</b>这是仿真测试与模型比较，不是实验发射度降低一个数量级。</div></div></article>
+          <article class="annotation-card"><div class="annotation-top"><span>DEMO-A03 · PDF p. 6</span><span class="er-tag">ER-03</span></div><div class="annotation-body"><blockquote>At 200 pC, the optimized projected emittance is about 0.36 μm, with mismatch values of 1.6 in x and 1.1 in y.</blockquote><div class="reader-comment"><b>Demo Reader：</b>200 pC 投影发射度结果；下一自然段给出与 Gaussian 的约 20% 比较。</div></div></article>
+          <article class="annotation-card"><div class="annotation-top"><span>DEMO-A04 · PDF p. 7</span><span class="er-tag">ER-04</span></div><div class="annotation-body"><blockquote>A pulse energy of about 1.7 mJ has been achieved for SASE 1 at 7.1 keV photon energy and for SASE 2 at about 7.6 keV photon energy.</blockquote><div class="reader-comment"><b>Demo Reader：</b>组会结果页可用；必须同时说 FEL tuning time 有限、未完全优化。</div></div></article>
+          <article class="annotation-card"><div class="annotation-top"><span>DEMO-A05 · PDF p. 5</span><span class="er-tag">ER-05</span></div><div class="annotation-body"><blockquote>the spatial shaping of the laser pulses, which can potentially further improve the bunch emittance, is not considered in this paper</blockquote><div class="reader-comment"><b>Demo Reader：</b>本文只讨论时间整形，不要宣称时空联合整形已经验证。</div></div></article>
+          <article class="annotation-card"><div class="annotation-top"><span>DEMO-A06 · PDF p. 8</span><span class="er-tag">ER-06</span></div><div class="annotation-body"><blockquote>The data that support the findings of this article are not publicly available. The data are available from the authors upon reasonable request.</blockquote><div class="reader-comment"><b>Demo Reader：</b>开放论文不等于开放数据；案例里不能写“附带完整实验数据”。</div></div></article>
+        </div>
+        <div class="button-row"><a href="demo-data/zotero-item.json">新建 CSL JSON 条目</a><a href="demo-data/zotero-item.bib">BibTeX</a><a href="demo-data/zotero-annotations.json">简化批注 JSON</a><a href="01文献笔记/tunnermann2026-AI整理前-批注导入.md">AI 整理前完整笔记</a></div>
+        <div class="panel-footer"><button class="nav-button prev" type="button">上一步</button><span class="key-hint">原文 · 评论 · 待核问题尚未分层</span><button class="nav-button primary next" type="button">下一步：AI 两遍整理</button></div>
+      </section>
+
+      <section class="step-panel" id="step-3" data-title="AI 两遍整理" aria-labelledby="step-3-title" hidden>
+        <div class="panel-head">
+          <div><p class="panel-kicker">Step 03 / Two-pass AI</p><h2 id="step-3-title">第一遍钉住证据，第二遍组织知识。</h2><p>点击三个阶段查看详细对照。第二遍没有新增实验事实，只增加概念连接、可复用表述与禁止过强措辞。</p></div>
+          <a class="source-link" href="98模板/AI两遍整理提示词.md">源文件：AI 两遍提示词</a>
+        </div>
+        <div class="stage-rail" role="tablist" aria-label="AI 整理阶段">
+          <button class="stage-card" type="button" role="tab" data-stage="before" aria-selected="true"><small>AI BEFORE</small><strong>批注导入</strong><span>高亮、评论、TODO 混合</span></button>
+          <button class="stage-card" type="button" role="tab" data-stage="pass1" aria-selected="false"><small>AI PASS 1</small><strong>证据结构化</strong><span>ER 编号、页码、强度、限制</span></button>
+          <button class="stage-card" type="button" role="tab" data-stage="pass2" aria-selected="false"><small>AI PASS 2</small><strong>可复用综合</strong><span>概念、措辞边界、组会结构</span></button>
+        </div>
+        <div class="stage-detail" id="stage-before" data-stage-panel="before" role="tabpanel">
+          <h3>整理前：信息在，但证据关系尚未成形</h3>
+          <p>原始导入把 0.4 μm、0.36 μm、20% 和一个数量级放在一起，也保留“结果挺好”这类主观评论。它能帮助回读，却不能直接进入组会。</p>
+          <div class="diff-line"><b>保留</b><span>citekey、DOI、六条原文引句、PDF 页码、虚构读者评论。</span></div>
+          <div class="diff-line"><b>问题</b><span>投影与切片、仿真与实验、事实与评论仍需分层。</span></div>
+          <div class="diff-line"><b>待办</b><span>回查约 20% 的完整原文，不能仅凭评论记数字。</span></div>
+          <div class="button-row"><a href="01文献笔记/tunnermann2026-AI整理前-批注导入.md">打开整理前笔记</a></div>
+        </div>
+        <div class="stage-detail" id="stage-pass1" data-stage-panel="pass1" role="tabpanel" hidden>
+          <h3>第一遍：每条可复用信息都有 Evidence Record</h3>
+          <ul><li>ER-01：双模型框架与 foundational step 定位。</li><li>ER-02：加入 ζ 后的仿真测试改进，不能写成实验发射度十倍变化。</li><li>ER-03：200 pC 同周比较约 0.46 → 0.36 μm，约 20%；与摘要 250 pC 中央切片值分开。</li><li>ER-04：两线站约 1.7 mJ，同时保留有限调谐时间。</li><li>ER-05 / ER-06：空间整形、MBI 范围与数据不公开。</li></ul>
+          <div class="diff-line"><b>新增结构</b><span>来源类型、claim strength、证据锚点、限制、削弱因素。</span></div>
+          <div class="diff-line"><b>没有新增</b><span>论文之外的实验结果、DOI、文献或研究空白。</span></div>
+          <div class="button-row"><a href="01文献笔记/tunnermann2026-AI第一遍-证据笔记.md">打开第一遍证据笔记</a></div>
+        </div>
+        <div class="stage-detail" id="stage-pass2" data-stage-panel="pass2" role="tabpanel" hidden>
+          <h3>第二遍：把证据变成可复用、但不过界的论述</h3>
+          <h4>允许写法</h4><p>“在本文 200 pC 同周优化比较中，投影发射度由约 0.46 μm 降至约 0.36 μm，约 20%。”</p>
+          <h4>禁止更强写法</h4><p>“时间平顶脉冲在所有电荷和装置上都降低 20%”或“250 pC 切片发射度也改善 20%”。</p>
+          <div class="diff-line"><b>概念提升</b><span>双模型协同；时间平顶脉冲与切片发射度。</span></div>
+          <div class="diff-line"><b>写作组织</b><span>8 页组会大纲，每页保留 citekey、PDF 页码和 ER 编号。</span></div>
+          <div class="diff-line"><b>主动排除</b><span>“AI 将所有 XFEL 发射度降低 20%”“作者开放全部实验数据”等无证据句子。</span></div>
+          <div class="button-row"><a href="01文献笔记/tunnermann2026-AI第二遍-可复用文献笔记.md">打开第二遍文献笔记</a></div>
+        </div>
+        <div class="panel-footer"><button class="nav-button prev" type="button">上一步</button><span class="key-hint">AI 增加结构，不增加证据强度</span><button class="nav-button primary next" type="button">下一步：概念笔记</button></div>
+      </section>
+
+      <section class="step-panel" id="step-4" data-title="概念笔记提升" aria-labelledby="step-4-title" hidden>
+        <div class="panel-head">
+          <div><p class="panel-kicker">Step 04 / Concepts</p><h2 id="step-4-title">概念可以复用，出处不能脱落。</h2><p>概念笔记不是更漂亮的摘要。它们保存可复用主张、证据强度、限制和允许措辞，并回链文献笔记。</p></div>
+          <a class="source-link" href="04导航页/演示导航.md">源文件：演示导航</a>
+        </div>
+        <div class="concept-grid">
+          <article class="concept-card"><span class="concept-no">CONCEPT 01 · ER-01 / ER-02 / ER-05</span><h3>物理模型与数据逆模型协同</h3><p>两个模型处理两个逆问题：目标 UV 波形如何反推 SLM 设置，目标发射度分布如何反推运行参数。</p><ul><li>物理信息模型：预补偿激光链失真，并用 UV 测量更新。</li><li>数据逆模型：30,000 个 ASTRA 仿真训练 encoder–decoder。</li><li>测量表示：加入 ζ 改善仿真测试中的逆映射学习。</li></ul><div class="wording"><div class="allowed"><strong>允许：</strong>双模型分别处理激光预补偿和发射度逆映射，实验围绕预测工作点细调。</div><div class="forbidden"><strong>禁止：</strong>系统已经实现跨装置通用、完全自动、无需人工调节的端到端闭环。</div></div><div class="button-row"><a href="02概念笔记/物理模型与数据逆模型协同.md">打开概念笔记</a></div></article>
+          <article class="concept-card"><span class="concept-no">CONCEPT 02 · ER-03 / ER-04 / ER-05</span><h3>时间平顶脉冲与切片发射度</h3><p>从时间激光形状到纵向电荷分布，再到空间电荷力与发射度；机制动机与具体实验结果分开表述。</p><ul><li>0.36 μm：200 pC 投影发射度。</li><li>约 0.4 μm：250 pC、20 ps 中央切片发射度。</li><li>0.36–0.49 μm：重复优化的中央切片范围。</li></ul><div class="wording"><div class="allowed"><strong>允许：</strong>在本文 200 pC 同周优化比较中约改善 20%。</div><div class="forbidden"><strong>禁止：</strong>时间平顶在任何装置、电荷和激光条件下都能降低 20% 发射度。</div></div><div class="button-row"><a href="02概念笔记/时间平顶脉冲与切片发射度.md">打开概念笔记</a></div></article>
+        </div>
+        <div class="notice green"><strong>提升规则：</strong>只有带证据锚点和 claim strength 的主张才进入概念笔记。证据弱时保留为观察或待核问题，不因“有双链”而升级。</div>
+        <div class="panel-footer"><button class="nav-button prev" type="button">上一步</button><span class="key-hint">概念笔记 → 文献笔记 → 公开 PDF</span><button class="nav-button primary next" type="button">下一步：复核边界</button></div>
+      </section>
+
+      <section class="step-panel" id="step-5" data-title="证据边界复核" aria-labelledby="step-5-title" hidden>
+        <div class="panel-head">
+          <div><p class="panel-kicker">Step 05 / Evidence gate</p><h2 id="step-5-title">哪些能写，哪些必须降格？</h2><p>输入关键词筛选六条证据记录。`supported` 只表示本文有具体支撑，不表示跨装置普遍成立。</p></div>
+          <a class="source-link" href="04导航页/证据索引.md">源文件：证据索引.md</a>
+        </div>
+        <label for="evidence-filter" class="panel-kicker">筛选证据 / FILTER</label>
+        <input class="filter-input" id="evidence-filter" type="search" placeholder="例如：ER-03、仿真、MBI、数据" autocomplete="off">
+        <div class="status" id="filter-status" role="status" aria-live="polite"></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID / 类型</th><th>可以支持</th><th>不能支持</th><th>PDF</th></tr></thead>
+            <tbody>
+              <tr class="evidence-row"><td>ER-01<br>方法 + 实验</td><td>双模型框架及 European XFEL 实验流程</td><td>通用、无人值守、全自动端到端闭环已验证</td><td>pp. 2–5</td></tr>
+              <tr class="evidence-row"><td>ER-02<br>ASTRA 仿真测试</td><td>加 ζ 后测试预测误差约降一个数量级、参数量约减 50%</td><td>实验发射度降低十倍；实测控制误差降低十倍</td><td>pp. 3–5</td></tr>
+              <tr class="evidence-row"><td>ER-03<br>注入器实验</td><td>200 pC 同周比较投影发射度约 0.46 → 0.36 μm，约 20%</td><td>所有条件均改善 20%；250 pC 切片值也改善 20%</td><td>pp. 1, 5–7</td></tr>
+              <tr class="evidence-row"><td>ER-04<br>FEL commissioning</td><td>两线站在 7.1/7.6 keV 均约 1.7 mJ</td><td>全局最优；长期稳定性定量提升</td><td>pp. 7–8</td></tr>
+              <tr class="evidence-row"><td>ER-05<br>范围声明</td><td>空间整形未做；MBI 系统敏感性研究超出范围</td><td>时空联合整形已验证；MBI 被普遍排除</td><td>pp. 5, 8</td></tr>
+              <tr class="evidence-row"><td>ER-06<br>Data Availability</td><td>全文 OA，但支撑数据不公开、可申请</td><td>原始实验数据已开放或本演示持有原始数据</td><td>p. 8</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="boundary-grid">
+          <div class="boundary-card"><strong>模型误差 ≠ 发射度</strong><span>一个数量级描述仿真测试预测误差。</span></div>
+          <div class="boundary-card"><strong>投影 ≠ 切片</strong><span>0.36 与约 0.4 μm 的条件和定义不同。</span></div>
+          <div class="boundary-card"><strong>达到输出 ≠ 达到上限</strong><span>1.7 mJ 必须连同有限调谐时间复述。</span></div>
+        </div>
+        <div class="notice amber"><strong>隐私边界：</strong>本目录没有私人 Vault 正文、真实个人库、订单或未公开工程资料。实际复用时，本地资料不等于本地模型，必须另行确认 AI 数据发送策略。</div>
+        <div class="panel-footer"><button class="nav-button prev" type="button">上一步</button><span class="key-hint">六条记录均可回查原始页码</span><button class="nav-button primary next" type="button">下一步：最终组会大纲</button></div>
+      </section>
+
+      <section class="step-panel" id="step-6" data-title="最终组会大纲" aria-labelledby="step-6-title" hidden>
+        <div class="panel-head">
+          <div><p class="panel-kicker">Step 06 / Group meeting</p><h2 id="step-6-title">12 分钟，8 页，科学论断全带回溯。</h2><p>展开每页查看讲述要点、出处和画面建议。页面与 Vault 中的最终 Markdown 大纲来自同一内容。</p></div>
+          <a class="source-link" href="03综述草稿/组会大纲/数据与模型引导的发射度优化-组会大纲.md">源文件：最终组会大纲.md</a>
+        </div>
+        <div class="outline-tools"><button class="nav-button" id="expand-outline" type="button">展开全部</button><button class="nav-button" id="collapse-outline" type="button">收起全部</button><button class="nav-button primary" id="print-outline" type="button">打印组会大纲</button></div>
+        <div class="outline-list">
+          <details class="outline-slide" open><summary><span class="slide-number">01</span><span class="slide-title">问题：怎样把目标激光形状变成可用束流与光子？</span><span class="slide-time">1 MIN</span></summary><div class="slide-content"><ul>
+            <li>论文关注高亮度光阴极注入器中的发射度优化，并把激光时间整形、注入器参数调节和 FEL commissioning 连成一条实验流程。</li>
+            <li>核心问题不是“AI 是否很新”，而是两个逆问题如何分工：如何产生目标 UV 波形，如何从目标发射度分布反推运行参数。</li>
+            <li>本页结论：论文提出双模型框架并开展实验展示；不预设其已经成为通用自动控制器。</li>
+          </ul><div class="citation">出处：[@tunnermann2026DataModel, PDF pp. 2–5, ER-01]</div><p class="visual-note">画面建议：Fig. 1 方法总图；讲解时标注“foundational step”。</p></div></details>
+          <details class="outline-slide"><summary><span class="slide-number">02</span><span class="slide-title">为什么是时间平顶？</span><span class="slide-time">1 MIN</span></summary><div class="slide-content"><ul>
+            <li>论文引言将注入器中的发射度退化与非线性空间电荷力联系起来，并把初始纵向电荷分布作为重要影响因素。</li>
+            <li>时间平顶分布的动机是使电荷分布更均匀、空间电荷力更线性，从而更好地保持发射度。</li>
+            <li>这里是机制动机；约 20% 的实验结果留到第 5 页，不提前把动机当成普遍定律。</li>
+          </ul><div class="citation">出处：[@tunnermann2026DataModel, PDF pp. 1–2, ER-01, ER-03]</div><p class="visual-note">画面建议：Gaussian 与 flattop 的示意对照；不要自行添加论文未报告的定量曲线。</p></div></details>
+          <details class="outline-slide"><summary><span class="slide-number">03</span><span class="slide-title">模型一：物理信息激光预补偿</span><span class="slide-time">2 MIN</span></summary><div class="slide-content"><ul>
+            <li>SLM 在频域调制振幅与相位；放大器增益饱和、自相位调制和 SHG 会使下游波形偏离目标。</li>
+            <li>可微前向模型模拟激光链，梯度下降迭代 SLM 设置，使预测输出逼近目标。</li>
+            <li>第二个自适应回路用 UV 测量与模型预测的差更新模型参数，以应对模型不完美和系统漂移。</li>
+            <li>Fig. 3 展示 semitriangle 与 flattop 目标及测得 UV 波形的吻合；这支持激光整形能力，不等同于发射度改善幅度。</li>
+          </ul><div class="citation">出处：[@tunnermann2026DataModel, PDF pp. 2–3, ER-01]</div><p class="visual-note">画面建议：Fig. 2 + Fig. 3，箭头标注“predistortion → optical chain → UV measurement → model update”。</p></div></details>
+          <details class="outline-slide"><summary><span class="slide-number">04</span><span class="slide-title">模型二：从目标发射度反推参数</span><span class="slide-time">2 MIN</span></summary><div class="slide-content"><ul>
+            <li>30,000 个 ASTRA 仿真用于训练 encoder–decoder；encoder 反推运行参数，decoder 学习正向重建。</li>
+            <li>仿真输入包括 σT、σxy、φ、Bmax；固定 250 pC 和 57.6 MV/m，并假设时间平顶与横向径向均匀。</li>
+            <li>只用发射度二阶矩可能使逆问题部分病态；加入 slice misalignment ζ 后，测试预测误差约降低一个数量级，保持相同预测精度时参数量约减少 50%。</li>
+            <li>必须强调：一个数量级是<strong>仿真测试预测误差</strong>，不是实验发射度改善。</li>
+          </ul><div class="citation">出处：[@tunnermann2026DataModel, PDF pp. 3–5, ER-02]</div><p class="visual-note">画面建议：Fig. 5 + Fig. 6；在“test prediction error”下加粗“不是 emittance reduction”。</p></div></details>
+          <details class="outline-slide"><summary><span class="slide-number">05</span><span class="slide-title">注入器实验：20% 必须带条件讲</span><span class="slide-time">2 MIN</span></summary><div class="slide-content"><ul>
+            <li>在 200 pC 同周优化比较中，Gaussian 条件下投影发射度约 0.46 μm，时间平顶条件下约 0.36 μm，作者报告约 20% 改善。</li>
+            <li>250 pC 下优化投影发射度约 0.395 μm；摘要中的约 0.4 μm 则是 250 pC、20 ps 条件下的中央切片发射度，测量定义不同。</li>
+            <li>Fig. 8 的 200 pC 对比显示时间平顶束团具有更平坦的切片发射度分布；重复优化中的中央切片值为 0.36–0.49 μm。</li>
+            <li>保守结论：本文具体条件下获得支持，不能外推为所有装置和运行点都改善 20%。</li>
+          </ul><div class="citation">出处：[@tunnermann2026DataModel, PDF pp. 1, 5–7, ER-03]</div><p class="visual-note">画面建议：Fig. 7 + Fig. 8；在数值旁直接写 `projected / 200 pC` 或 `central slice / 250 pC`。</p></div></details>
+          <details class="outline-slide"><summary><span class="slide-number">06</span><span class="slide-title">FEL commissioning：从束流到光子</span><span class="slide-time">1 MIN</span></summary><div class="slide-content"><ul>
+            <li>SASE 1 在约 7.1 keV 处达到约 1.7 mJ，SASE 2 在约 7.6 keV 处也达到约 1.7 mJ。</li>
+            <li>结果来自用户实验周前的专门 commissioning；作者指出调谐时间有限，FEL 性能未完全优化。</li>
+            <li>用户周证据提示时间平顶情形可能有更长 lasing window，但未给出定量稳定性提升，因此不写成“稳定性提高 X%”。</li>
+          </ul><div class="citation">出处：[@tunnermann2026DataModel, PDF pp. 7–8, ER-04]</div><p class="visual-note">画面建议：Fig. 9；图旁并列放“达到用户要求”和“未完全优化”。</p></div></details>
+          <details class="outline-slide"><summary><span class="slide-number">07</span><span class="slide-title">边界：这篇论文没有证明什么？</span><span class="slide-time">2 MIN</span></summary><div class="slide-content"><ul>
+            <li><strong>空间整形</strong>：未纳入本文；不能宣称时空联合整形已验证。[PDF p. 5, ER-05]</li>
+            <li><strong>MBI</strong>：研究所涉运行区间未观察到增强 MBI 的证据，但系统敏感性研究超出范围；不能写成“MBI 被排除”。[PDF p. 8, ER-05]</li>
+            <li><strong>测量与外推</strong>：20% 依附于 200 pC 同周投影发射度比较；中央切片结果有范围，且热发射度与阴极老化可能构成限制。[PDF pp. 5–7, ER-03]</li>
+            <li><strong>数据可用性</strong>：全文 CC BY 4.0，但支撑数据不公开、可向作者合理申请；本演示没有原始数据。[PDF p. 8, ER-06]</li>
+          </ul><div class="citation">出处：[@tunnermann2026DataModel, PDF pp. 5–8, ER-03, ER-05, ER-06]</div><p class="visual-note">画面建议：四行“已证明 / 未证明”对照，不将未来工作写成现有结果。</p></div></details>
+          <details class="outline-slide"><summary><span class="slide-number">08</span><span class="slide-title">带走三点 + 讨论</span><span class="slide-time">1 MIN</span></summary><div class="slide-content"><ul>
+            <li><strong>方法</strong>：物理信息模型与数据逆模型分工衔接，但实验仍是迈向完整端到端框架的基础步骤。[ER-01]</li>
+            <li><strong>证据</strong>：仿真预测误差、投影发射度、切片发射度和光子脉冲能量分别报告，不混用指标。[ER-02, ER-03, ER-04]</li>
+            <li><strong>边界</strong>：有限调谐、空间整形未做、MBI 待系统研究、支撑数据不公开。[ER-04, ER-05, ER-06]</li>
+            <li><strong>讨论问题</strong>：更换电荷或阴极后应如何重采样与验证？怎样设计对照以区分激光形状与调参历史？如何定量定义更长 lasing window？</li>
+          </ul><div class="citation">出处：[@tunnermann2026DataModel, PDF pp. 2–8, ER-01–ER-06]</div><p class="visual-note">结束语：“这篇论文的价值在于展示了一条可运行的证据链；我的复述也必须是一条可回查的证据链。”</p></div></details>
+        </div>
+        <div class="reference-box"><strong>参考文献：</strong>Tünnermann, H., Chen, Y., Klemps, A., et al. (2026). Data-model-guided framework for systemic emittance minimization in high-brightness photoinjectors. <em>Physical Review Accelerators and Beams</em>, 29(5), 050701. https://doi.org/10.1103/kk2s-s43l<br><strong>许可：</strong>CC BY 4.0。完整 19 位作者与再分发要求见本地“来源与许可”。若展示原图，保留作者、文章题名、期刊、DOI 与许可。</div>
+        <div class="panel-footer"><button class="nav-button prev" type="button">上一步</button><span class="key-hint">citekey + PDF 页码 + Evidence Record ID</span><button class="nav-button" data-step="0" type="button">回到第一步</button></div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="page-footer shell">
+    <div>公开论文 + 新建演示数据 · 无第三方插件依赖 · 无网页外部资源请求</div>
+    <div><a href="99附件/验证报告.md">链接与内容验证报告</a> · <a href="demo-data/README.md">数据说明</a> · 未创建远端仓库</div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+      const panels = Array.from(document.querySelectorAll(".step-panel"));
+      const stepButtons = Array.from(document.querySelectorAll(".step-button"));
+      const progress = document.getElementById("progress-bar");
+      const stepCount = document.getElementById("step-count");
+      let current = 0;
+
+      function goToStep(index, updateHash) {
+        current = Math.max(0, Math.min(panels.length - 1, Number(index)));
+        panels.forEach((panel, i) => { panel.hidden = i !== current; });
+        stepButtons.forEach((button, i) => {
+          if (i === current) button.setAttribute("aria-current", "step");
+          else button.removeAttribute("aria-current");
+        });
+        progress.style.width = ((current + 1) / panels.length * 100) + "%";
+        stepCount.textContent = "STEP " + String(current + 1).padStart(2, "0") + " / 06";
+        document.title = panels[current].dataset.title + "｜Obsidian + Zotero + AI";
+        if (updateHash !== false) {
+          try { history.replaceState(null, "", "#step-" + (current + 1)); }
+          catch (error) { location.hash = "step-" + (current + 1); }
+        }
+        const activeNav = stepButtons[current];
+        if (window.innerWidth < 760) activeNav.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      }
+
+      stepButtons.forEach(button => button.addEventListener("click", () => goToStep(button.dataset.step)));
+      document.querySelectorAll("[data-step]:not(.step-button)").forEach(button => button.addEventListener("click", () => goToStep(button.dataset.step)));
+      document.querySelectorAll(".next").forEach(button => button.addEventListener("click", () => goToStep(current + 1)));
+      document.querySelectorAll(".prev").forEach(button => button.addEventListener("click", () => goToStep(current - 1)));
+      document.addEventListener("keydown", event => {
+        if (event.target.matches("input, textarea, select, button, summary")) return;
+        if (event.key === "ArrowRight") goToStep(current + 1);
+        if (event.key === "ArrowLeft") goToStep(current - 1);
+      });
+      window.addEventListener("hashchange", () => {
+        const match = location.hash.match(/^#step-([1-6])$/);
+        if (match) goToStep(Number(match[1]) - 1, false);
+      });
+      const initial = location.hash.match(/^#step-([1-6])$/);
+      goToStep(initial ? Number(initial[1]) - 1 : 0, false);
+
+      const stageButtons = Array.from(document.querySelectorAll("[data-stage]"));
+      const stagePanels = Array.from(document.querySelectorAll("[data-stage-panel]"));
+      stageButtons.forEach(button => button.addEventListener("click", () => {
+        const stage = button.dataset.stage;
+        stageButtons.forEach(item => item.setAttribute("aria-selected", String(item === button)));
+        stagePanels.forEach(panel => { panel.hidden = panel.dataset.stagePanel !== stage; });
+      }));
+
+      const filter = document.getElementById("evidence-filter");
+      const rows = Array.from(document.querySelectorAll(".evidence-row"));
+      const filterStatus = document.getElementById("filter-status");
+      filter.addEventListener("input", () => {
+        const query = filter.value.trim().toLocaleLowerCase();
+        let visible = 0;
+        rows.forEach(row => {
+          const match = !query || row.textContent.toLocaleLowerCase().includes(query);
+          row.hidden = !match;
+          if (match) visible += 1;
+        });
+        filterStatus.textContent = query ? "显示 " + visible + " / " + rows.length + " 条证据" : "";
+      });
+
+      const outlineSlides = Array.from(document.querySelectorAll(".outline-slide"));
+      document.getElementById("expand-outline").addEventListener("click", () => outlineSlides.forEach(slide => { slide.open = true; }));
+      document.getElementById("collapse-outline").addEventListener("click", () => outlineSlides.forEach(slide => { slide.open = false; }));
+      document.getElementById("print-outline").addEventListener("click", () => {
+        outlineSlides.forEach(slide => { slide.open = true; });
+        document.body.classList.add("print-outline");
+        window.print();
+      });
+      window.addEventListener("afterprint", () => document.body.classList.remove("print-outline"));
+
+      const copyButton = document.getElementById("copy-doi");
+      const copyStatus = document.getElementById("copy-status");
+      copyButton.addEventListener("click", async () => {
+        const doi = "10.1103/kk2s-s43l";
+        try {
+          if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(doi);
+          else {
+            const helper = document.createElement("textarea");
+            helper.value = doi;
+            helper.style.position = "fixed";
+            helper.style.opacity = "0";
+            document.body.appendChild(helper);
+            helper.select();
+            const copied = document.execCommand("copy");
+            helper.remove();
+            if (!copied) throw new Error("copy unavailable");
+          }
+          copyStatus.textContent = "DOI 已复制";
+        } catch (error) {
+          copyStatus.textContent = "请手动复制：" + doi;
+        }
+      });
+    }());
+  </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+{
+  "schema": "obsidian-zotero-ai-demo/simplified-annotations/v1",
+  "demoNotice": "Newly created teaching annotations. DEMO001, annotation IDs, dates, colors and Demo Reader comments are fictional demonstration data. Exact quotes and page anchors come from the public CC BY 4.0 paper. This is not an official Zotero export or direct-import backup.",
+  "itemKey": "DEMO001",
+  "citekey": "tunnermann2026DataModel",
+  "doi": "10.1103/kk2s-s43l",
+  "reader": "Demo Reader (fictional)",
+  "annotations": [
+    {
+      "annotationID": "DEMO-A01",
+      "type": "highlight",
+      "pageIndex": 0,
+      "pageLabel": "1",
+      "color": "#ffd400",
+      "dateAdded": "2026-11-12T09:00:00Z",
+      "exactText": "A measured central slice emittance of about 0.4 μm at 250 pC is achieved using a 20 ps flattop laser pulse at the photocathode.",
+      "comment": "摘要数值：250 pC、中央切片发射度、20 ps。不要和 200 pC 的投影发射度比较混在一起。",
+      "evidenceCandidate": "ER-03"
+    },
+    {
+      "annotationID": "DEMO-A02",
+      "type": "highlight",
+      "pageIndex": 4,
+      "pageLabel": "5",
+      "color": "#5ea8ff",
+      "dateAdded": "2026-11-12T09:03:00Z",
+      "exactText": "To be precise, the modeling with extended measurements yielded (i) a faster training convergence, (ii) a decreased test prediction error by around one order of magnitude, (iii) a reduction of model complexity by approximately 50% (measured by the number of parameters) while maintaining the same prediction accuracy compared to the model with measurements y as defined in (1).",
+      "comment": "这是仿真测试与模型比较，不是实验发射度降低一个数量级。",
+      "evidenceCandidate": "ER-02"
+    },
+    {
+      "annotationID": "DEMO-A03",
+      "type": "highlight",
+      "pageIndex": 5,
+      "pageLabel": "6",
+      "color": "#70c98f",
+      "dateAdded": "2026-11-12T09:06:00Z",
+      "exactText": "At 200 pC, the optimized projected emittance is about 0.36 μm, with mismatch values of 1.6 in x and 1.1 in y.",
+      "comment": "200 pC 投影发射度结果；下一自然段给出与 Gaussian 的约 20% 比较。",
+      "evidenceCandidate": "ER-03"
+    },
+    {
+      "annotationID": "DEMO-A04",
+      "type": "highlight",
+      "pageIndex": 6,
+      "pageLabel": "7",
+      "color": "#70c98f",
+      "dateAdded": "2026-11-12T09:09:00Z",
+      "exactText": "A pulse energy of about 1.7 mJ has been achieved for SASE 1 at 7.1 keV photon energy and for SASE 2 at about 7.6 keV photon energy.",
+      "comment": "组会结果页可用；必须同时说 FEL tuning time 有限、未完全优化。",
+      "evidenceCandidate": "ER-04"
+    },
+    {
+      "annotationID": "DEMO-A05",
+      "type": "highlight",
+      "pageIndex": 4,
+      "pageLabel": "5",
+      "color": "#ff9f80",
+      "dateAdded": "2026-11-12T09:12:00Z",
+      "exactText": "the spatial shaping of the laser pulses, which can potentially further improve the bunch emittance, is not considered in this paper",
+      "comment": "范围限制：本文只讨论时间整形，不要宣称时空联合整形已经验证。",
+      "evidenceCandidate": "ER-05"
+    },
+    {
+      "annotationID": "DEMO-A06",
+      "type": "highlight",
+      "pageIndex": 7,
+      "pageLabel": "8",
+      "color": "#ff9f80",
+      "dateAdded": "2026-11-12T09:15:00Z",
+      "exactText": "The data that support the findings of this article are not publicly available. The data are available from the authors upon reasonable request.",
+      "comment": "开放论文不等于开放数据；案例里不能写“附带完整实验数据”。",
+      "evidenceCandidate": "ER-06"
+    }
+  ]
+}

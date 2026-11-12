@@ -1,0 +1,722 @@
+===== PDF PAGE 1 =====
+Data-model-guided framework for systemic emittance minimization
+in high-brightness photoinjectors
+H. Tünnermann, 1,* Y . Chen , 1,† A. Klemps , 3 D. Ilia , 1,2 M. Cai , 1,2 N. Ay,3 B. Beutner, 1
+F. Brinker,1 W. Decking , 1 J. Good,1 I. Hartl , 1 W. Hillert , 1,2 Y . Jiang , 1 C. Li,1 T. Long , 1
+C. Mahnke , 1 H. Panuganti , 1 F. Pressacco,1 and M. Scholz 1
+1Deutsches Elektronen-Synchrotron DESY , Notkestraße 85, 22607, Hamburg, Germany
+2University of Hamburg , Luruper Chaussee 149, 22761, Hamburg, Germany
+3Hamburg University of Technology , Blohmstraße 15, 21079, Hamburg, Germany
+(Received 14 December 2025; accepted 15 April 2026; published 8 May 2026)
+Bunch shaping in electron linear accelerators is of critical importance, as it enables the realization of
+prescribed projection profiles along specific coordinates of the bunch distribution for linac-based x-ray
+free-electron laser (XFEL) applications. It is evident that temporally flattop electron bunches yield more
+uniform slice properties, reduced emittance growth, and enhanced FEL gain compared to conventional
+Gaussian profiles. In this work, we present a data- and model-guided framework that consists of a physics-
+informed model and an inverse emittance model for minimizing the bunch emittance through laser pulse
+shaping and the control of laser and accelerator parameters in high-brightness photoinjectors. With a
+temporal flattop laser shape selected, a flat slice emittance distribution along the bunch has been
+experimentally obtained at the European XFEL. A measured central slice emittance of about 0 :4 μma t
+250 pC is achieved using a 20 ps flattop laser pulse at the photocathode. Here we present the results of a
+commissioning experiment, marking a practical application of temporally flattop-shaped electron bunches
+for stable photon delivery in a user experiment week at the facility. Within limited tuning time, a pulse
+energy of 1.7 mJ has been achieved at photon energies of 7.1 and 7.6 keV for the two hard x-ray undulator
+beamlines, surpassing the user requirements. Such a data- and model-driven framework opens up new
+opportunities for end-to-end optimization of machine parameters, thereby enhancing the capabilities of
+large-scale FEL facilities.
+DOI: 10.1103/kk2s-s43l
+I. INTRODUCTION
+The brightness of an x-ray free-electron laser (FEL) is
+critically dependent on the quality of the electron bunch
+that drives it, with low transverse emittance being a
+paramount goal. A significant source of emittance degra-
+dation arises from strong nonlinear space-charge forces
+within the electron bunch in the photoinjector, an effect
+directly tied to the initial longitudinal charge distribution.
+While conventional Gaussian laser pulses produce bunches
+susceptible to such emittance growth, temporally flattop
+profiles are predicted to generate a more uniform charge
+distribution, thereby linearizing space-charge forces and
+enabling better emittance preservation.
+Temporal flattop picosecond pulses were generated in [1]
+using a passive pulse-stacking technique with multiple
+birefringent crystals, whereas [2] presented detailed theo-
+retical and experimental studies of this shaping method.
+Using these techniques, emittance reduction of photoelec-
+trons has been demonstrated in accelerator facilities [3–5].
+Schemes for generating spatiotemporal flattop laser pulses
+for low-emittance photoinjectors have been studied and/or
+demonstrated worldwide [6–13]. Recently, a dispersion
+controlled nonlinear shaping method was proposed at
+SLAC for temporal shaping of narrow-band picosecond
+pulses [14] and simulations of nonlinearly shaped UV
+pulses were carried out for LCLS-II [15]. In China, the
+temporal shaping capability of the photoinjector laser
+system for Shenzhen superconducting soft x-ray free-
+electron laser (S3FEL) was reported in [16]. Generation
+of longitudinal flattop pulses was discussed in [17] for the
+Shanghai soft x-ray free-electron laser (SXFEL). While
+these efforts successfully established the value of temporal
+shaping, they also highlight a fundamental trade-off in
+shaping methodologies. Techniques that shape the pulse
+directly in the UV at high power, for instance, avoid the
+need for complex precompensation but are often passive or
+*Contact author: henrik.tuennermann@desy.de
+†Contact author: ye.lining.chen@desy.de
+Published by the American Physical Society under the terms of
+the Creative Commons Attribution 4.0 International license.
+Further distribution of this work must maintain attribution to
+the author(s) and the published article ’s title, journal citation,
+and DOI.
+PHYSICAL REVIEW ACCELERA TORS AND BEAMS 29, 050701 (2026)
+Editors' Suggestion
+2469-9888=26=29(5)=050701(9) 050701-1 Published by the American Physical Society
+
+===== PDF PAGE 2 =====
+mechanically-driven, offering limited flexibility and online
+tunability. Conversely, shaping at the low-energy frontend
+offers immense versatility for generating arbitrary profiles
+but requires a sophisticated control strategy to precompen-
+sate for the significant nonlinear distortions in downstream
+amplifiers. This motivates the development of advanced
+adaptive control schemes that can harness the full flexibility
+of frontend shaping and reliably deliver any target pulse
+shape on demand. At the European XFEL [18], recent work
+has focused on adaptive, closed-loop pulse shaping and
+model-driven transfer of optimized profiles to the opera-
+tional laser [19]. This enables the generation and precise
+control of arbitrary, targeted temporal pulse shapes, includ-
+ing flattop profiles.
+In this paper, we report on an end-to-end demonstration
+of the temporal bunch shaping concept for photon delivery
+at the European XFEL user facility. We have developed and
+implemented a model-driven laser shaping system to
+generate high-fidelity flattop UV pulses at the photo-
+cathode. Subsequent injector optimization and beam char-
+acterization indicate an improved control over the slice
+emittance distribution along the bunch. A system layout is
+sketched in Fig. 1. Culminating this effort, we successfully
+commissioned these flattop bunches for FEL lasing, deliv-
+ering the required high-intensity photon pulses for user
+experiments. This result validates advanced temporal shap-
+ing as a robust and practical tool for optimizing and
+controlling FEL performance. The paper is organized as
+follows. In Sec. I, a brief introduction on the proposed
+framework is given. Section II elucidates the temporal
+shaping capabilities of the cathode laser system at the
+European XFEL based on a physics-informed model. In
+Sec. III, a data-driven inverse modeling approach on the
+bunch slice emittance is presented. For the demonstration
+of the end-to-end concept, systemic optimization of the
+projected and sliced emittance of the electron bunch is
+carried out in Sec. IV, which is then followed by a dedicated
+FEL commissioning experiment as described in Sec. V.
+A conclusion and an outlook are given in Sec. VI.
+II. LASER PULSE SHAPING VIA A
+PHYSICS-INFORMED APPROACH
+The temporal profile of the cathode laser pulse directly
+determines the initial longitudinal charge distribution of
+the electron bunch, which is a critical parameter for
+minimizing space-charge-induced emittance growth in
+the photoinjector. To generate electron bunches with a
+temporal flattop profile, which is highly desirable for
+uniform slice properties, we have developed an advanced
+laser system capable of producing arbitrary temporal
+shapes with high precision [19,20].
+The laser is a pulsed, burst-mode system designed for
+photoinjector operation. The architecture, depicted sche-
+matically in Fig. 2, is based on a mode-locked oscillator that
+generates a train of seed pulses. These pulses are then passed
+through a fiber-based preamplifier stage. The core of the
+shaping capability is integrated within this frontend section: a
+commercial spatial light modulator (SLM), the waveshaper.
+This device operates in the frequency domain, modulating
+both amplitude and phase to shape the pulse. Subsequent to
+the frontend, the pulse train is further amplified in high-
+power solid-state amplifiers before undergoing two stages of
+second-harmonic generation (SHG) to convert the funda-
+mental wavelength of 1030 nm to the operational UV
+wavelength required for photoemission from the cathode.
+For precise shaping, we furthermore need to be able to
+measure the pulse shape, which is implemented using a
+difference frequency generation cross correlator between a
+1030 nm reference and the converted 257 nm UV beam.
+The primary challenge in generating a specific temporal
+profile at the photocathode is that the shape programmed
+into the SLM is significantly distorted by the downstream
+optical chain. The main sources of this distortion are gain
+saturation in the amplifier stages, which disproportionately
+amplifies the leading edge of the pulse, and nonlinear
+effects such as self-phase modulation and SHG. To achieve
+the desired final pulse shape, these effects must be actively
+precompensated. This can be accomplished by applying an
+inverse transfer function of the amplifier and frequency
+conversion chain to the target profile at the SLM. The
+programmed shape is therefore intentionally predistorted
+such that, after undergoing the expected amplification and
+nonlinear evolution, it emerges as the desired clean
+temporal profile at the photocathode.
+Determining the precise predistorted input for the SLM
+requires an accurate, differentiable forward model of the
+FIG. 1. Conceptual layout of the data- and model-driven
+emittance optimization system.
+FIG. 2. Schematic of the laser pulse shaping system.
+H. TÜNNERMANN et al. PHYS. REV . ACCEL. BEAMS 29, 050701 (2026)
+050701-2
+
+===== PDF PAGE 3 =====
+entire laser amplification and frequency conversion chain.
+To this end, we have developed a physics-informed model
+that simulates the pulse propagation, accounting for key
+effects like gain saturation, self-phase modulation, and
+frequency up-conversion. This model allows us to frame
+the task as an inverse problem: we use a gradient-descent-
+based optimization algorithm to iteratively adjust the
+spectral amplitude and phase at the SLM, minimizing
+the error between the model ’s predicted output and the
+desired target profile.
+Recognizing that any such model is an imperfect approxi-
+mation and that system conditions can drift, our method
+incorporates a second adaptive optimization loop. After
+applying a new shape and measuring the resulting UV pulse,
+the discrepancy between the measurement and the model ’s
+prediction is used to update the model’s internal parameters,
+again via gradient descent. This creates an adaptive control
+system that not only finds the correct precompensation but
+also continuously refines its own accuracy. The detailed
+implementation of this dual-optimization framework is
+presented in separate publications [21].
+Figure 3 illustrates this principle. The target temporal
+semitriangle profile (a) and flattop profile (b) are achieved
+by programming individually highly nonuniform, predis-
+torted shapes into the SLM. After passing through the
+entire laser chain, the final measured UV pulses (blue
+curves) at a virtual cathode diagnostic [22] closely match
+the targets, demonstrating the successful compensation of
+all system-induced distortions and the high fidelity of our
+shaping technique.
+III. DATA-DRIVEN INVERSE MODELING
+OF EMITTANCE
+The ability to precisely generate arbitrary temporal laser
+profiles is a critical prerequisite, but the ultimate goal is to
+optimize the electron bunch properties, specifically the
+slice emittance. To this end, we have developed a data-
+driven inverse model that learns the complex, nonlinear
+mapping from slice-emittance profile measurements to
+machine parameters that are the most likely to yield these
+measurements. This approach allows us to directly specify
+a desired target emittance profile and have the model
+predict the optimal machine settings required to achieve it.
+To this end, we conducted beam dynamics start-to-end
+simulations executed with the simulation code ASTRA [23],
+uniformly varying certain simulation parameters within
+a priori defined sampling ranges derived from the usual
+operation regime. Those parameters are the temporal
+FWHM bunch length σT , the transverse rms spot size on
+the photocathode σxy, the phase φ of the electric field in the
+electron gun, and the maximum on-axis field gradient of the
+main focusing gun solenoid Bmax. Furthermore, the sim-
+ulations were conducted at a fixed charge of 250 pC and
+gun gradient of 57.6 MV=m assuming temporal flattop and
+transverse radial uniform shapes.
+From a total ofn ¼ 30 000simulations, we extracted input-
+output pairsfðxi; yiÞgn i¼1,w h e r exi ≔ ðσT;i ; σxy;i; φi;B max;iÞ
+represents the simulation inputs andyi a measurement of the
+resulting phase space downstream of the electron source. In the
+course of our work, we experimented with different definitions
+of the measurements vectory, which had a crucial impact on
+the quality of solutions to the inverse problem mapping
+measurements to inputs, as shown below.
+Our model architecture of choice is based on an encoder-
+decoder neural network arrangement trained in a supervised
+manner on the sampled data. The encoder network is
+designed to solve the inverse problem: given a measure-
+ment y, it predicts the corresponding operational param-
+eters x that most likely have caused the measurement. The
+decoder network, conversely, learns the forward process,
+reconstructing the expected measurement y from a given set
+of operational parameters x. For both encoder and decoder,
+the learning objectives are defined by the mean squared
+error between predictions and targets and are optimized
+independently. This dual structure allows for robust train-
+ing, self-consistent validation, and the combination of
+surrogate models for both forward and inverse beam
+dynamics processes.
+Since usual emittance measurements involve slicing the
+bunch into N ∈ ℕ bunch slices, we first defined a meas-
+urement
+y ¼ð z1; …;z N ;d 1 · ε1; …;d N · εN Þ (1)
+as an assembly of the respective slice centers z1; …;z N with
+respect to the bunch center and the corresponding normal-
+ized transverse slice emittances ε1; /C1/C1/C1 ; εN weighted by
+slice charge densities d1; …;d N , emphasizing the core of
+the bunch. However, since emittance provides only a
+second-order moment description of the transverse phase
+space, the inverse prediction of the full bunch state from
+such measurements is, in general, not uniquely constrained
+and may therefore be partially ill-posed.
+The reconstruction performance obtained using this mea-
+surement vector is shown in Fig. 4(a). The reconstruction
+errors across all inferred parameters are summarized using
+box-and-whisker plots, where the box spans the inter-
+quartile range (25th to 75th percentile), the central line
+FIG. 3. Laser shape targets and resulting temporal laser shapes:
+(a) a semitriangle shape; (b) a flattop shape.
+DA TA-MODEL-GUIDED FRAMEWORK FOR … PHYS. REV . ACCEL. BEAMS 29, 050701 (2026)
+050701-3
+
+===== PDF PAGE 4 =====
+indicates the median, and the whiskers extend to 1.5× IQR.
+Figure 4(b) shows the correlations between the input
+parameters and the measurement vector components, con-
+firming that the emittance-based measurements capture
+relevant phase space information while leaving room for
+further improvement in reconstruction accuracy.
+In order to incorporate more phase space information
+into the measurements y without too much of an increase of
+input dimensionality to the inverse problem, we identified
+the inclusion of slice misalignments ζ [24] as a suitable
+option. For each slice j ∈ ½1; 2; …;N /C138, ζj is defined as
+ζj ≔ 1 2 ½β0γj − α0αj þ γ0βi/C138 ≥ 1; (2)
+in terms of slice twiss parameters αj; βj; γj and bunch twiss
+parameters α0; β0; γ0, quantifying the misalignment of the
+slice phase space with respect to the whole bunch phase
+space. With this new extracted feature, we extended the
+previously defined measurements (1) to
+ˆy ≔ ðz1; …;z N ;d 1 · ε1; …;d N · εN ;d 1 · ζ1; …;d N · ζN Þ:
+(3)
+The resulting reconstruction performance is shown in
+Fig. 5(a) using the same box-and-whisker representation. A
+systemic reduction in both the median error and the spread
+across parameters is observed. This improvement is further
+reflected in the convergence behavior during training
+shown in Fig. 5(b), which demonstrates faster convergence
+and a lower final prediction error compared to the emit-
+tance-only measurement vector.
+Our experiments conducted with N ∈ f20; 40g slices
+confirm the beneficial influence of the measurement
+FIG. 4. Training results with measurements of shape (1).
+Inferring the phase φ from emittance measurement solely is
+ill-conditioned due to incomplete phase space information
+encoded in y, reflected by a higher prediction error. As depicted
+by the correlation matrix in (a), shape parameters σT and σxy
+show moderate correlation with the mean slice emittance
+¯ε ≔ 1 N PN i¼1 εi, while machine parameters φ and Bmax better
+correlate with misalignments, ζ10 in that case. (a) L1 test
+encoding error distributions, (b) input-output correlations.
+FIG. 5. Training results with inclusion of slice misalignments,
+yielding faster convergence and lower encoder prediction error.
+Without, inferring the phase φ from emittance measurement
+solely is ill-conditioned due to incomplete phase space informa-
+tion encoded in y. (a) L1 test encoding error distributions,
+(b) training convergence.
+H. TÜNNERMANN et al. PHYS. REV . ACCEL. BEAMS 29, 050701 (2026)
+050701-4
+
+===== PDF PAGE 5 =====
+extension ˆy by slice misalignmentsζ on the learning process.
+To be precise, the modeling with extended measurements
+yielded (i) a faster training convergence, (ii) a decreased test
+prediction error by around one order of magnitude, (iii) a
+reduction of model complexity by approximately 50%
+(measured by the number of parameters) while maintaining
+the same prediction accuracy compared to the model with
+measurements y as defined in (1).
+The predictive accuracy of the trained model is verified
+numerically against test simulation data not seen during
+training. Figure 6 demonstrates this for a target flat slice-
+emittance profile (a), selected from ASTRA simulations. The
+encoder network successfully predicts a corresponding set
+of operational parameters. When these parameters are used
+to run a new ASTRA simulation, the resulting emittance
+profiles [Fig. 6(b)] show excellent agreement with the
+original target. The model ’s internal decoder network also
+produces a consistent reconstruction, validating its grasp of
+the forward dynamics.
+IV. EXPERIMENTS
+The combination of the adaptive laser model described in
+Sec. II with the inverse model on the emittance in the
+injector introduced in Sec. III can ultimately establish a
+powerful end-to-end optimization framework, capable of
+inversely determining the optimal laser shape and injector
+parameters for optimal beam quality. As a foundational step
+toward this goal, the work presented in this section focuses
+on producing a high-fidelity flattop pulse and systemically
+optimizing the injector performance experimentally.
+A general layout of the photoinjector at the European
+XFEL can be found in [25]. The injector consists of a laser-
+driven photocathode rf gun, a post accelerating module, a
+third harmonic module, a laser heater, a transverse deflect-
+ing structure (TDS), a magnetic spectrometer, and other
+diagnostic components. The quality of temporally flattop-
+shaped electron bunches is characterized by their peak
+current, current profile, and both the transverse projected
+and sliced emittance. The temporal characteristics are
+evaluated using time-resolved measurements based on a
+TDS. The emittance is determined through a multiquadru-
+pole scan technique. In combination with the TDS mea-
+surements, the transverse projected emittance of individual
+slices along the bunch can be resolved [26]. More detailed
+description on simulating the beam dynamics in the injector
+and verifying relevant models can be found in [22,27].
+For demonstration purposes, the overall strategy first
+involves generating a temporally flattop-shaped cathode
+drive-laser pulse using the adaptive laser model, and then
+modeling an as-flat-as-possible slice-emittance distribution
+along the bunch by finely tuning the laser and injector
+parameters around the predicted working point of the
+inverse emittance model. For simplicity, the laser pulse
+length is fixed at about 20 ps (full width at half maximum)
+in these measurements. Owing to the matching-condition
+requirements in the injector, a systemic optimization of the
+transverse projected emittance, together with the matching
+parameter, is first performed to ensure that the central slices
+along the bunch are properly aligned. Note also that both
+lasers in the twin system at the European XFEL, X1 and
+X2, have been put into operation for commissioning
+purposes [20], and that the spatial shaping of the laser
+pulses, which can potentially further improve the bunch
+emittance, is not considered in this paper.
+The obtained results are summarized in Figs. 7 and 8.
+Figure 7 shows the progression of experimental optimization
+of the transverse projected emittance using two cathode
+lasers (X1 and X2) and two temporal laser shapes (Gaussian
+and flattop) at two bunch charges (200 and 250 pC, indicated
+on the right axis). The upper plot presents the 100% trans-
+verse projected emittance obtained with a temporal Gaussian
+shape for both X1 and X2 lasers at 200 pC, and with a
+temporal flattop shape for the X2 laser at 200 and 250 pC.
+The selected bunch charge was dictated by technical con-
+siderations to ensure consistency with previous user experi-
+ments. The lower plot displays the corresponding mismatch
+parameter in the injector section for both the horizontal ( x)
+and vertical ( y) planes. As shown in Fig. 7, dedicated
+optimization using temporally flattop-shaped electron
+bunches yielded a projected emittance of about 0.395 μm,
+FIG. 6. Parameter prediction from test input slice profile and
+reconstructions with ASTRA and decoder neural network. Pre-
+dicted parameters in (a) are shown normalized with respect to
+the boundaries of their sampling ranges and mapped to the
+interval ½−1; 1/C138. Ground truth values for each parameter are
+shown as blue filled bars, predicted values as red bordered bars.
+The prediction error is visualized as mismatch between these.
+(a) Encoder parameter predictions, (b) reconstructions from
+predicted parameters.
+DA TA-MODEL-GUIDED FRAMEWORK FOR … PHYS. REV . ACCEL. BEAMS 29, 050701 (2026)
+050701-5
+
+===== PDF PAGE 6 =====
+with mismatch values of 1.4 in x and 1.2 in y at 250 pC. At
+200 pC, the optimized projected emittance is about0.36 μm,
+with mismatch values of 1.6 inx and 1.1 iny. Compared with
+the optimized emittance of approximately0.46 μma t2 0 0p C
+achieved using temporally Gaussian laser pulses during the
+same development week, this corresponds to an improvement
+of about 20% in the projected emittance, along with reduc-
+tions in the mismatch parameters of 1.8 in x and 1.5 in y by
+roughly 10% and 20%, respectively.
+Figure 8 illustrates the measured bunch current profiles
+and slice emittance for the X2 temporal flattop laser (right
+plot) in comparison with those obtained using the X1
+temporal Gaussian laser (left plot). As shown, electrons are
+more uniformly distributed in the central region of the
+bunch for the flattop case, resulting in a flatter current
+profile. While the Gaussian bunch exhibits a pronounced
+emittance increase toward its center, the flattop bunch at the
+same 200 pC charge shows a significantly flatter and more
+FIG. 7. Experimental optimization of projected emittance of the bunch in the injector section: history of projected emittance
+optimization using two cathode lasers, two temporal laser profiles, and three bunch charges: X1 Gaussian laser, X2 Gaussian laser, and
+X2 flattop-shaped laser (upper plot); corresponding matching parameter Bmag [24] in both horizontal ( X) and vertical ( Y) directions
+during the optimization (lower plot). Note that the mismatch parameter equal to 1 indicates a perfect matching condition.
+FIG. 8. Measured slice emittance in the injector for X1 temporal Gaussian laser (left plot) and X2 temporal flattop-shaped laser (right
+plot) at 200 pC bunch charge, respectively.
+H. TÜNNERMANN et al. PHYS. REV . ACCEL. BEAMS 29, 050701 (2026)
+050701-6
+
+===== PDF PAGE 7 =====
+uniform slice emittance profile, with improved matching
+throughout. Across repeated optimization measurements,
+the central slice emittance for the flattop case consistently
+falls within the range of 0.36 to 0.49 μm. Notably, the
+pronounced bump in the slice emittance observed for the
+Gaussian case reflects enhanced space-charge effects and
+a strongly asymmetric distribution. Despite injector opti-
+mization, this feature persisted, likely due to transverse
+nonuniformities and asymmetries in the laser profile during
+the experiment, which further amplify space-charge-driven
+emittance growth. In contrast, the flattop profile mitigates
+these effects by providing a more uniform initial charge
+distribution.
+As a rule of thumb, assuming the thermal emittance of
+cesium-telluride photocathodes manufactured using a rec-
+ipe similar to that at DESY is 1.1 μm=mm (rms) [28], the
+intrinsic cathode emittance for a transverse uniform beam
+of 1 mm diameter is approximately 0.28 μm. This indicates
+that thermal emittance contributes approximately 60% –
+70% of the measured total emittance, which may already
+constitute a record performance for low-emittance electron
+beam generation at the European XFEL. The cesium-
+telluride photocathode used for these measurements has
+been in operation for many years. Over longer timescales,
+cathode aging effects may increasingly contribute to
+emittance growth and become a more significant limiting
+factor. It is also worth noting that the optimized character-
+istics of the flattop-shaped electron bunch distribution are
+expected to further enhance the SASE lasing process,
+provided that microbunching effects remain negligible
+under an optimized machine operating point, as observed
+in our experiments.
+V. FEL COMMISSIONING USING
+FLATTOP-SHAPED ELECTRON BUNCHES
+To further validate the quality of the optimized flattop-
+shaped electron bunch as obtained in Sec. IV, a dedicated
+FEL commissioning experiment was conducted just before
+a user experiment week, aiming to enable robust FEL setup
+and lasing at the photon energies required by the users.
+Without significant modifications to the bunch compres-
+sion stages downstream of the injector, a full-scale FEL
+setup along with SASE tuning was accomplished within a
+short time.
+Figure 9 shows an optimization history of the FEL/
+photon pulse energy at two undulator beamlines, SASE 1
+(upper plot) and SASE 2 (lower plot), respectively. A pulse
+energy of about 1.7 mJ has been achieved for SASE 1 at
+7.1 keV photon energy and for SASE 2 at about 7.6 keV
+photon energy. The levels of the photon energies at two
+beamlines are determined by the user requirements. It
+should be noted that the FEL performance is not fully
+optimized. This is mainly due to the limited FEL tuning
+time that is available before the following user-run week.
+However, the obtained results have experimentally dem-
+onstrated that good lasing performance can be established
+using the flattop-shaped electron bunches. The evidence
+collected during the user-run week suggested a longer
+lasing window in the flattop case compared to nominal
+Gaussian laser pulses. This can be attributed to the much
+flatter measured slice emittance distribution along the
+bunch, meaning that more slices can effectively contri-
+bute to the SASE process due to their improved emittance.
+More importantly, the experimental results demonstrate the
+FIG. 9. Pulse energy history of short-term FEL tuning at two undulator beamlines using X2 temporally flattop-shaped cathode laser:
+SASE 1 undulators at about 7.1 keV photon energy (upper plot) and SASE 2 undulators at about 7.6 keV photon energy (lower plot).
+DA TA-MODEL-GUIDED FRAMEWORK FOR … PHYS. REV . ACCEL. BEAMS 29, 050701 (2026)
+050701-7
+
+===== PDF PAGE 8 =====
+effectiveness of the optimization strategy enabled by the
+proposed data- and model-driven framework.
+In addition to the emittance improvement enabled by
+laser pulse shaping, we emphasize that FEL performance is
+ultimately determined by beam brightness and can be
+limited by microbunching instability (MBI) through slice
+energy spread (SES) growth during compression. In the
+present study, no evidence of enhanced MBI was observed
+for the flattop distribution. The adaptive laser shaping
+approach generates temporally smooth profiles without
+high-frequency modulations that could seed additional
+microbunching, and the finite carrier transport effects of
+the cesium-telluride cathode further suppress the transfer of
+very short-wavelength laser fluctuations to the electron
+beam. Moreover, both Gaussian and flattop beams were
+compressed with identical optics and laser heater settings,
+and no abnormal SES growth or compression limitations
+were detected. These observations indicate that, within
+the investigated operating regime, MBI did not limit the
+brightness or FEL performance of the flattop bunch.
+Dedicated studies on the sensitivity of different laser pulse
+shapes to MBI, including systemic variation of microscopic
+modulation spectra and compression parameters, are
+beyond the scope of this work and will be the subject of
+future investigations.
+VI. CONCLUSION
+A data- and model-driven framework is proposed to
+minimize the electron bunch emittance through advanced
+laser pulse shaping and control schemes for linac-based
+XFELs. The approach integrates a physics-informed model
+that achieves a targeted temporal profile of the cathode
+drive-laser pulse via iterative adjustment of the SLM ’s
+spectral amplitude and phase, together with an inverse
+emittance model that enables a targeted slice-emittance
+distribution along the bunch by tuning both laser and
+accelerator parameters. For demonstration, temporally flat-
+top electron bunches were generated and optimized using
+the proposed approach, resulting in an improvement of the
+transverse emittance by approximately 20%, as well as a
+more uniform slice-emittance distribution compared to
+conventional Gaussian pulses in the comparative experi-
+ments. An FEL commissioning experiment was conducted,
+marking the first demonstration of flattop bunches for the
+lasing optimization. Although the FEL performance could
+not be fully optimized due to limited tuning time, stable
+lasing with photon pulse energies of around 1.7 mJ was
+achieved at both hard x-ray beamlines, corresponding to
+user-specified photon energies of 7.1 and 7.6 keV . Further
+experimental studies are planned to systemically inves-
+tigate the impact of laser pulse shaping on FEL pulse
+properties, as well as the sensitivity of different laser pulse
+shapes to microbunching instability.
+The achieved emittance reduction is of essential impor-
+tance for SASE lasing at higher photon energies in the FEL
+fundamental mode. Emittance improvement becomes even
+more critical for XFELs operating in continuous-wave
+mode, where the available electron beam energy is typically
+significantly reduced [29]. Combining the temporal shap-
+ing approach reported here with future spatial shaping
+techniques could further reduce the bunch emittance.
+Additionally, replacing the current aged cathode with a
+fresh one may lower the fundamental limit of the slice
+emittance even further. It should be noted that such a data-
+and model-driven framework not only enables comprehen-
+sive end-to-end optimization of machine parameters, but
+also represents a transformative step toward fully digital-
+ized and intelligently controlled FEL facilities, where
+automated decision making will be essential for achieving
+unprecedented levels of performance, stability, and scien-
+tific reach.
+ACKNOWLEDGMENTS
+We thank the operation teams from DESY and the
+European XFEL for their support. The authors gratefully
+acknowledge partial funding by the German Federal
+Ministry of Research, Technology and Space (BMFTR)
+through the project OPAL-FEL, Grants No. 13D22CH6,
+No. 05D23GT1, and No. 05D23GU3.
+DATA AVAILABILITY
+The data that support the findings of this article are not
+publicly available. The data are available from the authors
+upon reasonable request.
+[1] I. Will and G. Klemz, Generation of flat-top picosecond
+pulses by coherent pulse stacking in a multicrystal bi-
+refringent filter, Opt. Express 16, 14922 (2008) .
+[2] A. K. Sharma, T. Tsang, and T. Rao, Theoretical and
+experimental study of passive spatiotemporal shaping of
+picosecond laser pulses, Phys. Rev. ST Accel. Beams 12,
+033501 (2009) .
+[3] S. Cialdi and I. Boscolo, A laser pulse shaper for the
+low-emittance radiofrequency sparc electron gun, Nucl.
+Instrum. Methods Phys. Res., Sect. A 526, 239 (2004) .
+[4] I. V . Bazarov, D. G. Ouzounov, B. M. Dunham, S. A.
+Belomestnykh, Y . Li, X. Liu, R. E. Meller, J. Sikora,
+C. K. Sinclair, F. W. Wise, and T. Miyajima, Efficient
+temporal shaping of electron distributions for high-
+brightness photoemission electron guns, Phys. Rev. ST
+Accel. Beams 11, 040702 (2008) .
+[5] M. Krasilnikov et al. , Experimentally minimized beam
+emittance from an L-band photoinjector, Phys. Rev. ST
+Accel. Beams 15, 100701 (2012) .
+[6] C. Limborg-Deprey and P . R. Bolton, Optimum electron
+distributions for space charge dominated beams in photo-
+injectors, Nucl. Instrum. Methods Phys. Res., Sect. A 557,
+106 (2006) , Energy Recovering Linacs 2005.
+[7] D. Garzella, O. Gobert, P . Hollander, F. Lepetit, M. Perdrix,
+and T. Oksenhendler, Temporal analysis and shape control
+H. TÜNNERMANN et al. PHYS. REV . ACCEL. BEAMS 29, 050701 (2026)
+050701-8
+
+===== PDF PAGE 9 =====
+of UV high energy laser pulses for photoinjectors, in
+Proceedings of the 28th International Free Electron
+Laser Conference, FEL-2006, BESSY, Berlin, Germany
+(2006), https://epaper.kek.jp/f06/PAPERS/THPPH001
+.PDF.
+[8] M. B. Danailov, A. A. Demidovich, and R. Ivanov, Design
+of a two-stage laser pulse shaping system for FEL photo-
+injectors, in Proceedings of the 28th International Free
+Electron Laser Conference, FEL-2006, BESSY, Berlin,
+Germany (2006), pp. 617 –620, https://epaper.kek.jp/f06/
+PAPERS/THPPH026.PDF.
+[9] H. Tomizawa, H. Dewa, H. Hanaki, and F. Matsui,
+Development of a yearlong maintenance-free terawatt Ti:
+Sapphire laser system with a 3d UV-pulse shaping system
+for THG, Quantum Electron. 37, 697 (2007) .
+[10] F. Zhou, D. Bohler, Y . Ding, S. Gilevich, Z. Huang, H.
+Loos, D. Ratner, and S. V etter, Characterizing and opti-
+mizing photocathode laser distributions for ultra-low
+emittance electron beam operations, Reports No. SLAC-
+PUB-16436, No. SLAC-PUB-16491, SLAC National Ac-
+celerator Laboratory, 2015, https://www.slac.stanford.edu/
+pubs/slacpubs/16250/slac-pub-16491.pdf.
+[11] Z. Zhang, Y . Ding, Z. Huang, and F. Zhou, Multiplexed
+photoinjector optimization for high-repetition-rate free-
+electron lasers, Front. Phys. 11, 1166216 (2023) .
+[12] S. Bettoni, M. Pedrozzi, and S. Reiche, Low emittance
+injector design for free electron lasers, Phys. Rev. ST
+Accel. Beams 18, 123403 (2015) .
+[13] E. Prat, P . Dijkstal, M. Aiba, S. Bettoni, P . Craievich, E.
+Ferrari, R. Ischebeck, F. Löhl, A. Malyzhenkov, G. L.
+Orlandi, S. Reiche, and T. Schietinger, Generation and
+characterization of intense ultralow-emittance electron
+beams for compact x-ray free-electron lasers, Phys. Rev.
+Lett. 123, 234801 (2019) .
+[14] R. Lemons, N. Neveu, J. Duris, A. Marinelli, C. Durfee,
+and S. Carbajo, Temporal shaping of narrow-band pico-
+second pulses via noncolinear sum-frequency mixing of
+dispersion-controlled pulses, Phys. Rev. Accel. Beams 25,
+013401 (2022) .
+[15] N. Neveu, R. Lemons, J. Duris, J. Tang, Y . Ding, A.
+Marinelli, and S. Carbajo, Simulation of nonlinearly
+shaped UV pulses in lCLS-II, Nucl. Instrum. Methods
+Phys. Res., Sect. A 1072, 170065 (2025) .
+[16] B. Zhang, X. Li, Q. Liu, Z. Zhu, W. Zhang, Z. He, W. Liu,
+G. Wu, and X. Yang, High repetition-rate photoinjector
+laser system for S3FEL, Front. Phys. 11, 1181862 (2023) .
+[17] C. Li, X. Dai, H. Deng, L. Feng, B. Liu, J. Wang, X. Wang,
+and W. Zhang, Photoinjector drive laser temporal shaping
+for Shanghai soft x-ray free electron laser, in Proceedings
+of the 12th International Particle Accelerator Conference,
+IPAC-2021, Campinas, SP, Brazil (JACoW, Geneva,
+Switzerland, 2021).
+[18] W. Decking, S. Abeghyan, P . Abramian, A. Abramsky, A.
+Aguirre, C. Albrecht, P . Alou, M. Altarelli, P . Altmann,
+K. Amyan et al. , A MHz-repetition-rate hard x-ray free-
+electron laser driven by a superconducting linear accel-
+erator, Nat. Photonics 14, 391 (2020) .
+[19] D. Ilia, C. Li, U. Grosse-Wortmann, I. Hartl, Y . Jiang, C.
+Mahnke, H. Panuganti, F. Pressacco, H. Tavakol, and H.
+Tünnermann, Advanced pulse shaping for photoinjector
+lasers, in Frontiers in Ultrafast Optics: Biomedical, Sci-
+entific, and Industrial Applications XXV, SPIE Proceedings
+V ol. 13353 (SPIE-International Society for Optics and
+Photonics, Bellingham, W A, 2025), p. 133530F
+[20] C. Mahnke et al. , Novel photocathode lasers for the hard-
+and soft-x-ray free electron lasers EuXFEL and FLASH,
+EPJ Web Conf. 307, 04001 (2024) .
+[21] D. Ilia, N. Ay, I. Hartl, W. Hillert, and H. Tünnermann,
+Differentiable models for control of complex physical
+systems: A case study in laser pulse shaping, in Proceed-
+ings of the NeurIPS Machine Learning and the Physical
+Sciences Workshop (2025), https://ml4physicalsciences
+.github.io/2025/files/NeurIPS_ML4PS_2025_61.pdf.
+[22] Y . Chen, I. Zagorodnov, and M. Dohlus, Beam dynamics
+of realistic bunches at the injector section of the European
+x-ray free-electron laser, Phys. Rev. Accel. Beams 23,
+044201 (2020) .
+[23] K. Floettmann, A space charge tracking algorithm, ASTRA
+version 4.0, https://www.desy.de/~mpyflo/ [accessed:
+November 30, 2024].
+[24] P . Emma and W. Spence, Grid scans: A transfer map
+diagnostic, in Proceedings of the Particle Accelerator
+Conference, San Francisco, CA, 1991 (IEEE, New Y ork,
+1991).
+[25] F. Brinker, Commissioning of the European XFEL injector,
+in Proceedings of the 7th International Particle Acceler-
+ator Conference, IPAC-2016, Busan, Korea (JACoW,
+Geneva, Switzerland, 2016), pp. 1044 –1047, 10.18429/
+JACoW-IPAC2016-TUOCA03.
+[26] M. Scholz and B. Beutner, Electron beam phase space
+tomography at the European XFEL injector, in Proceed-
+ings of the 8th International Particle Accelerator
+Conference, IPAC-2017, Copenhagen, Denmark (JACoW,
+Geneva, Switzerland, 2017).
+[27] I. Zagorodnov, S. Tomin, Y . Chen, and F. Brinker,
+Experimental validation of collective effects modeling at
+injector section of x-ray free-electron laser, Nucl. Instrum.
+Methods Phys. Res., Sect. A 995, 165111 (2021) .
+[28] P .-W. Huang et al. , Single shot cathode transverse mo-
+mentum imaging in high brightness photoinjectors, Phys.
+Rev. Accel. Beams 23, 043401 (2020) .
+[29] D. Bazyl, Y . Chen, M. Dohlus, and T. Limberg, CW
+operation of the European XFEL: SC-gun injector opti-
+mization, S2E calculations and SASE performance,
+arXiv:2111.01756.
+DA TA-MODEL-GUIDED FRAMEWORK FOR … PHYS. REV . ACCEL. BEAMS 29, 050701 (2026)
+050701-9

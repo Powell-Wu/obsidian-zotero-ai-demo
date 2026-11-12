@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-12",
+  "status": "PASS",
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36 Edg/157.0.0.0",
+  "checks": [
+    {
+      "name": "离线 file:// 加载",
+      "pass": true,
+      "detail": "[\"step-1\"]"
+    },
+    {
+      "name": "无外部静态资源请求",
+      "pass": true,
+      "detail": "0 个资源请求"
+    },
+    {
+      "name": "六步导航与桌面布局",
+      "pass": true,
+      "detail": "6/6 步可切换，无页面级横向溢出"
+    },
+    {
+      "name": "AI 阶段对照交互",
+      "pass": true,
+      "detail": "{\"pass2\":true,\"beforeHidden\":true,\"selected\":\"true\"}"
+    },
+    {
+      "name": "证据筛选",
+      "pass": true,
+      "detail": "{\"visible\":1,\"status\":\"显示 1 / 6 条证据\"}"
+    },
+    {
+      "name": "组会大纲展开与出处",
+      "pass": true,
+      "detail": "{\"open\":8,\"citations\":8}"
+    },
+    {
+      "name": "390px 移动布局",
+      "pass": true,
+      "detail": "6/6 步无页面级横向溢出"
+    },
+    {
+      "name": "浏览器控制台",
+      "pass": true,
+      "detail": "0 个错误"
+    }
+  ],
+  "consoleErrors": []
+}
